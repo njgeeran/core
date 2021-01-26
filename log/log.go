@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-var log loger
+var log Loger
 
 func init()  {
 	filepath := getFilePath()
@@ -51,6 +51,6 @@ func getFilePath() string {
 	return logfile
 }
 
-func GetLoger() *loger {
+func GetLoger() *Loger {
 	return &log
 }
