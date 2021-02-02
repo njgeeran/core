@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/whileW/enze-global/utils"
+	"github.com/whileW/lowcode-core/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -43,7 +43,7 @@ func init()  {
 
 func getFilePath() string {
 	path := utils.GetCurrentDirectory() + "/Log"
-	err := utils.CreateDir(path)
+	err := utils.MkdirIfNotExist(path)
 	if err != nil {
 		panic("创建日志文件夹失败："+err.Error())
 	}
