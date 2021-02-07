@@ -13,7 +13,7 @@ type Response struct {
 
 type BasePageModel struct {
 	Data		interface{}			`json:"data"`
-	Count		int					`json:"count"`
+	Count		int64				`json:"count"`
 }
 
 type ResCode int

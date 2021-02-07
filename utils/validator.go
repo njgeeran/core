@@ -9,6 +9,15 @@ import (
 
 type Rules map[string][]string
 
+var compareMap = map[string]bool{
+	"lt": true,
+	"le": true,
+	"eq": true,
+	"ne": true,
+	"ge": true,
+	"gt": true,
+}
+
 // 非空 不能为其对应类型的0值
 func NotEmpty() string {
 	return "notEmpty"
@@ -54,52 +63,76 @@ func Gt(mark string) string {
 	return "gt=" + mark
 }
 // 校验方法 接收两个参数  入参实例，规则map
-func Verify(st interface{}, roleMap Rules) (err error) {
-	compareMap := map[string]bool{
-		"lt": true,
-		"le": true,
-		"eq": true,
-		"ne": true,
-		"ge": true,
-		"gt": true,
-	}
+func Verify(roleMap Rules,st ...interface{}) (err error) {
+	//typ := reflect.TypeOf(st)
+	 // 获取reflect.Type类型
 
-	typ := reflect.TypeOf(st)
-	val := reflect.ValueOf(st) // 获取reflect.Type类型
-
-	kd := val.Kind() // 获取到st对应的类别
-	if kd != reflect.Struct {
-		return errors.New("expect struct")
+	//kd := val.Kind() // 获取到st对应的类别
+	//if kd != reflect.Struct {
+	//	return errors.New("expect struct")
+	//}
+	for _,t := range st {
+		typ := reflect.TypeOf(t)
+		val := reflect.ValueOf(t)
+		if err := verify("",typ,val,roleMap);err != nil{
+			return err
+		}
 	}
+	return nil
+}
+func verifyStruct(name string,typ reflect.Type,val reflect.Value,roleMap Rules) error {
 	num := val.NumField()
 	// 遍历结构体的所有字段
 	for i := 0; i < num; i++ {
-		tagVal := typ.Field(i)
-		val := val.Field(i)
-		if len(roleMap[tagVal.Name]) > 0 {
-			for _, v := range roleMap[tagVal.Name] {
+		val_t := val.Field(i)
+		typ_t := typ.Field(i)
+		name := IF(name == "",typ_t.Name,name+"."+typ_t.Name).(string)
+		if err := verify(name,typ_t.Type, val_t, roleMap); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func verifyArray(name string,typ reflect.Type,val reflect.Value,roleMap Rules) error {
+	for i := 0; i < val.Len(); i++ {
+		val_t := val.Index(i)
+		if err := verify(name,val_t.Type(),val_t,roleMap);err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func verify(name string,typ reflect.Type,val reflect.Value,roleMap Rules) error {
+	switch val.Kind() {
+	case reflect.Slice, reflect.Array:
+		return verifyArray(name,typ,val,roleMap)
+	case reflect.Struct:
+		return verifyStruct(name,typ,val,roleMap)
+	default:
+		if len(roleMap[name]) > 0 {
+			for _, v := range roleMap[name] {
 				switch {
 				case v == "notEmpty":
 					if isBlank(val) {
-						return errors.New(tagVal.Name + "值不能为空")
+						return errors.New(name + "值不能为空")
 					}
 				case v == "verPhone":
 					phone := val.String()
 					if !MatchPhone(phone) {
-						return errors.New(tagVal.Name + "未通过验证：手机号格式错误")
+						return errors.New(name + "未通过验证：手机号格式错误")
 					}
 				case v == "verEmail":
 					email := val.String()
 					if !MatchEmail(email) {
-						return  errors.New(tagVal.Name + "未通过验证：邮箱格式错误")
+						return  errors.New(name + "未通过验证：邮箱格式错误")
 					}
 				case strings.Split(v, "=")[0] == "verRegexp":
 					if !verRegexp(val,v) {
-						return errors.New(tagVal.Name + "正则校验失败," + v)
+						return errors.New(name + "正则校验失败," + v)
 					}
 				case compareMap[strings.Split(v, "=")[0]]:
 					if !compareVerify(val, v) {
-						return errors.New(tagVal.Name + "长度或值不在合法范围," + v)
+						return errors.New(name + "长度或值不在合法范围," + v)
 					}
 				}
 			}
