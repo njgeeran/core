@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/whileW/lowcode-core/conf"
 	"github.com/whileW/lowcode-core/log"
+	"gorm.io/gorm"
+	"os"
 )
 
 //orm 依赖conf和log
@@ -22,12 +24,12 @@ func InitOrm(conf *conf.Config) *Orm {
 
 	db_s,ch := conf.Setting.GetChildd_c("db")
 	orm = NewOrm()
-	init_orm(db_s,orm)
+	init_orms(db_s,orm)
 	go func() {
 		for {
 			select {
 			case <-ch:
-				init_orm(conf.Setting.GetChildd("db"),orm)
+				init_orms(conf.Setting.GetChildd("db"),orm)
 				log.GetLoger().Info("监听到数据库配置修改,重新初始化数据库")
 			}
 		}
@@ -35,17 +37,31 @@ func InitOrm(conf *conf.Config) *Orm {
 	return orm
 }
 
-func init_orm(db_s *conf.Settings,orms *Orm)  {
+func init_orms(db_s *conf.Settings,orms *Orm)  {
 	for k,_ := range *db_s {
-		switch k {
-		case "mysql":
-			v := db_s.GetChildd("mysql")
-			InitMySql(v,orms)
-			break
-		case "mssql":
-			v := db_s.GetChildd("mssql")
-			InitMsSql(v,orms)
-			break
+		v := db_s.GetChildd(k)
+		adapter := OrmInters[k]
+		for kk,_ := range *v {
+			s := v.GetChild(kk)
+			orm_db := init_orm(s,adapter)
+			orms.Set(kk,orm_db)
 		}
+	}
+}
+func init_orm(s *conf.Settings,adapter orm_inter) *gorm.DB {
+	username,password,path := s.GetStringd("username","root"),s.GetString("password"),s.GetStringd("path","127.0.0.1:3306")
+	db_name,config := s.GetString("db_name"),s.GetStringd("config","charset=utf8&parseTime=True&loc=Local")
+	max_idle_conns,max_open_conns := s.GetIntd("max-idle-conns",10),s.GetIntd("max-open-conns",10)
+	oc := &gorm.Config{
+	}
+	if db, err := gorm.Open(adapter.Open(username,password,path,db_name,config),oc); err != nil {
+		fmt.Println("MySQL启动异常:"+err.Error())
+		os.Exit(0)
+		return nil
+	} else {
+		sql_db,_ := db.DB()
+		sql_db.SetMaxIdleConns(max_idle_conns)
+		sql_db.SetMaxOpenConns(max_open_conns)
+		return db
 	}
 }
