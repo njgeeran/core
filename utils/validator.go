@@ -67,7 +67,7 @@ func Verify(roleMap Rules,st interface{}) (err error) {
 	typ := reflect.TypeOf(st)
 	val := reflect.ValueOf(st)
 	kd := val.Kind() // 获取到st对应的类别
-	if kd != reflect.Struct || kd != reflect.Array {
+	if kd != reflect.Struct && kd != reflect.Array {
 		return errors.New("expect struct")
 	}
 	return verify("",typ,val,roleMap)
