@@ -63,7 +63,7 @@ func Gt(mark string) string {
 	return "gt=" + mark
 }
 // 校验方法 接收两个参数  入参实例，规则map
-func Verify(roleMap Rules,st interface{}) (err error) {
+func Verify(st interface{},roleMap Rules) (err error) {
 	typ := reflect.TypeOf(st)
 	val := reflect.ValueOf(st)
 	kd := val.Kind() // 获取到st对应的类别
@@ -71,6 +71,15 @@ func Verify(roleMap Rules,st interface{}) (err error) {
 		return errors.New("expect struct")
 	}
 	return verify("",typ,val,roleMap)
+}
+func VerifyField(name string,st interface{},roleMap Rules) (err error) {
+	typ := reflect.TypeOf(st)
+	val := reflect.ValueOf(st)
+	kd := val.Kind()
+	if kd == reflect.Struct || kd == reflect.Array {
+		return errors.New("expect struct")
+	}
+	return verify(name,typ,val,roleMap)
 }
 func verifyStruct(name string,typ reflect.Type,val reflect.Value,roleMap Rules) error {
 	num := val.NumField()
