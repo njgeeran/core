@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/whileW/lowcode-core/utils"
+	"github.com/njgeeran/core/utils"
 	"net/http"
 )
 

@@ -2,9 +2,9 @@ package core
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/whileW/lowcode-core/conf"
-	"github.com/whileW/lowcode-core/log"
-	"github.com/whileW/lowcode-core/middleware"
+	"github.com/njgeeran/core/conf"
+	"github.com/njgeeran/core/log"
+	"github.com/njgeeran/core/middleware"
 )
 
 func InitGin() *gin.Engine {

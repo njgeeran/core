@@ -2,8 +2,8 @@ package orm
 
 import (
 	"fmt"
-	"github.com/whileW/lowcode-core/conf"
-	"github.com/whileW/lowcode-core/log"
+	"github.com/njgeeran/core/conf"
+	"github.com/njgeeran/core/log"
 )
 
 //orm 依赖conf和log

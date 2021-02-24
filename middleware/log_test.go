@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/whileW/lowcode-core/log"
+	"github.com/njgeeran/core/log"
 	"testing"
 	"time"
 )

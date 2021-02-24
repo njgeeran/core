@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
-	"github.com/whileW/lowcode-core/log"
+	"github.com/njgeeran/core/log"
 	"strings"
 	"time"
 )

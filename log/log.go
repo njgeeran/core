@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/whileW/lowcode-core/utils"
+	"github.com/njgeeran/core/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"

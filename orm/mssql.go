@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mssql"
-	"github.com/whileW/lowcode-core/conf"
-	"github.com/whileW/lowcode-core/log"
+	"github.com/njgeeran/core/conf"
+	"github.com/njgeeran/core/log"
 	"net/url"
 	"os"
 )

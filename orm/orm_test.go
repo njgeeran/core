@@ -2,7 +2,7 @@ package orm
 
 import (
 	"fmt"
-	"github.com/whileW/lowcode-core/conf"
+	"github.com/njgeeran/core/conf"
 	"testing"
 )
 
