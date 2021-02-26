@@ -53,6 +53,7 @@ func Compress(dest string,files ...*os.File) error {
 		if err != nil {
 			return err
 		}
+		file.Close()
 	}
 	return nil
 }

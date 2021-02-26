@@ -49,7 +49,7 @@ func TestVerify(t *testing.T)  {
 		"Test2Arr.Name":{NotEmpty()},
 		"Test2Arr.Test3.Name":{NotEmpty()},
 	}
-	if err := Verify(role,tt);err != nil{
+	if err := Verify(tt,role);err != nil{
 		fmt.Println(err)
 		return
 	}
