@@ -118,11 +118,7 @@ func (s *Settings)GetBoold(key string,d bool) bool {
 	return s.Getd(key,d).(bool)
 }
 func (s *Settings)GetChildd(key string) *Settings {
-	v := s.Getd(key,nil)
-	if v == nil {
-		return nil
-	}
-	return v.(*Settings)
+	return s.Getd(key,&Settings{}).(*Settings)
 }
 
 func (s *Settings)Getd_c(key string,d interface{})(interface{},chan int) {
