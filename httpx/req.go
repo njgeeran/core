@@ -38,7 +38,11 @@ func Post(url, contentType string, req_body []byte) ([]byte,error) {
 		contentType = "application/json"
 	}
 	resp,err := http.Post(url,contentType,bytes.NewReader(req_body))
-	defer resp.Body.Close()
+	defer func() {
+		if resp != nil && resp.Body != nil {
+			resp.Body.Close()
+		}
+	}()
 	if err != nil {
 		return nil,err
 	}
