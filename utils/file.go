@@ -2,9 +2,15 @@ package utils
 
 import (
 	"archive/tar"
+	"archive/zip"
+	"bytes"
 	"compress/gzip"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 	"io"
+	"io/ioutil"
 	"os"
+	"strings"
 )
 
 //压缩文件夹&文件-不包含当前文件夹
@@ -95,4 +101,65 @@ func compress(file *os.File, prefix string, tw *tar.Writer) error {
 		}
 	}
 	return nil
+}
+
+//解压
+func DeCompressZip(zipFile, dest string) error {
+	reader, err := zip.OpenReader(zipFile)
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+	for _, file := range reader.File {
+		decodeName := ""
+		if file.Flags == 0 {
+			//如果标致位是0  则是默认的本地编码   默认为gbk
+			i:= bytes.NewReader([]byte(file.Name))
+			decoder := transform.NewReader(i, simplifiedchinese.GB18030.NewDecoder())
+			content,_:= ioutil.ReadAll(decoder)
+			decodeName = string(content)
+		}else{
+			//如果标志为是 1 << 11也就是 2048  则是utf-8编码
+			decodeName = file.Name
+		}
+		rc, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer rc.Close()
+		filename := dest + decodeName
+		err = os.MkdirAll(getDir(filename), 0755)
+		if err != nil {
+			return err
+		}
+		w, err := os.Create(filename)
+		if err != nil {
+			return err
+		}
+		defer w.Close()
+		_, err = io.Copy(w, rc)
+		if err != nil {
+			return err
+		}
+		w.Close()
+		rc.Close()
+	}
+	return nil
+}
+func getDir(path string) string {
+	return subString(path, 0, strings.LastIndex(path, "/"))
+}
+func subString(str string, start, end int) string {
+	rs := []rune(str)
+	length := len(rs)
+
+	if start < 0 || start > length {
+		panic("start is wrong")
+	}
+
+	if end < start || end > length {
+		panic("end is wrong")
+	}
+
+	return string(rs[start:end])
 }

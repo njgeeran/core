@@ -8,5 +8,6 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/spf13/viper v1.7.1
 	go.uber.org/zap v1.16.0
+	golang.org/x/text v0.3.2
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
